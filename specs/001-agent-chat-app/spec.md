@@ -16,6 +16,7 @@
 - Q: For v1, how should the backend agent produce replies when no external AI service is configured? → A: Pluggable — mock by default when unconfigured; real AI when credentials/env are set.
 - Q: While the agent is still streaming a reply, what should happen if the user tries to send another message? → A: Block — disable input/send until the current stream completes.
 - Q: Should the health/status endpoint report which agent mode is active and whether the external AI service is reachable? → A: Full status — report active mode (mock/real) and upstream reachability when in real AI mode.
+- Q: What is the maximum length for a single user message in characters? → A: 4,000 characters.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -72,7 +73,7 @@
 - 使用者送出空白或僅含空白字元的訊息時，系統應阻止送出或提示輸入有效內容，不應向後端發送無效請求。
 - 後端在串流中途斷線或逾時時，介面應顯示已收到部分內容，並以明確訊息告知回覆中斷，允許使用者重試。
 - 使用者在 agent 尚未回覆完成時再次送出訊息時，系統 MUST 停用輸入與送出按鈕，直到目前串流回覆完成為止；不排隊、不取消進行中的回覆。
-- 使用者輸入極長訊息（例如超過 4,000 字）時，系統應拒絕或截斷並提示長度限制。
+- 使用者輸入超過 4,000 字元的訊息時，系統 MUST 拒絕送出並以繁體中文提示長度上限為 4,000 字元；不截斷、不傳送至後端。
 - 重新整理頁面後，對話紀錄清空（v1 無持久化）；使用者應能立即開始新對話。
 
 ## Requirements *(mandatory)*
@@ -92,10 +93,11 @@
 - **FR-010**: 當後端不可用或串流失敗時，系統 MUST 向使用者顯示可理解的錯誤訊息（繁體中文），並允許重試。
 - **FR-011**: 後端 agent MUST 支援可切換模式：未設定外部 AI 服務憑證或環境變數時，使用內建 mock 產生確定性示範回覆；已設定時，使用真實外部 AI 服務產生回覆。兩種模式 MUST 皆支援串流輸出。
 - **FR-012**: 當 agent 正在串流回覆時，系統 MUST 停用訊息輸入與送出功能，直到串流完成；使用者 MUST NOT 能在回覆進行中送出新訊息。
+- **FR-013**: 單則使用者訊息 MUST NOT 超過 4,000 字元；超過時系統 MUST 拒絕送出並顯示繁體中文錯誤提示，不得截斷後傳送。
 
 ### Key Entities
 
-- **Message**: 單則對話內容，包含角色（使用者或 agent）、文字內容、顯示順序。v1 僅存在於目前工作階段的記憶體中。
+- **Message**: 單則對話內容，包含角色（使用者或 agent）、文字內容、顯示順序。使用者訊息上限 4,000 字元。v1 僅存在於目前工作階段的記憶體中。
 - **Chat Thread**: 單一連續對話序列，由依序排列的 Message 組成。v1 僅允許一個 thread，無名稱或分頁。每次請求 MUST 攜帶完整 thread 歷史至後端（僅存於工作階段記憶體，重新整理後清空）。
 
 ## Success Criteria *(mandatory)*

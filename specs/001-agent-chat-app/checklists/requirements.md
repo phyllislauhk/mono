@@ -31,7 +31,7 @@
 
 ## Notes
 
-- All checklist items pass on first validation iteration (2026-08-12).
+- All checklist items pass (2026-08-12); clarification session complete (5/5 questions).
 - User-provided acceptance criteria mapped to User Stories 1–3 and FR-001–FR-005.
 - v1 exclusions explicitly documented in Out of Scope and FR-006–FR-009.
-- Ready for `/speckit-plan`.
+- Ready for `/speckit-plan` (completed) or `/speckit-tasks`.
