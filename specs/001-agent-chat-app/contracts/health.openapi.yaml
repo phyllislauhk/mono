@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Agent Chat App Health API
+  version: 1.0.0
+  description: Extended health/status endpoint for agent chat backend (v1)
+
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Extended health and agent mode status
+      description: |
+        Returns service health, active agent mode (mock/real), and upstream
+        reachability when in real AI mode. Satisfies FR-004.
+      responses:
+        "200":
+          description: Service is running; may be healthy or degraded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              examples:
+                mockHealthy:
+                  summary: Mock mode healthy
+                  value:
+                    schema_version: "1.0.0"
+                    status: healthy
+                    agent_mode: mock
+                    upstream_reachable: null
+                    request_id: "550e8400-e29b-41d4-a716-446655440000"
+                    timestamp: "2026-08-12T07:33:00Z"
+                realDegraded:
+                  summary: Real mode, upstream unreachable
+                  value:
+                    schema_version: "1.0.0"
+                    status: degraded
+                    agent_mode: real
+                    upstream_reachable: false
+                    request_id: "550e8400-e29b-41d4-a716-446655440001"
+                    timestamp: "2026-08-12T07:33:00Z"
+        "503":
+          description: Service unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - schema_version
+        - status
+        - agent_mode
+        - upstream_reachable
+        - request_id
+        - timestamp
+      properties:
+        schema_version:
+          type: string
+          const: "1.0.0"
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        agent_mode:
+          type: string
+          enum: [mock, real]
+        upstream_reachable:
+          type: ["boolean", "null"]
+          description: null when agent_mode is mock
+        request_id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
