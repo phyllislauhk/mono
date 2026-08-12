@@ -46,7 +46,7 @@ Build a local-development agent chat application where users send Traditional Ch
 | II. Optimize for Deletion | ✅ Pass | ✅ Pass | Small modules: `agent.py`, `mock_model.py`, `health.py`, single `Chat` page |
 | III. Explicit Dependencies | ✅ Pass | ✅ Pass | Model factory injects dependencies; env vars read at startup only |
 | IV. Contract at Boundary | ✅ Pass | ✅ Pass | AG-UI protocol + OpenAPI `health.openapi.yaml` v1.0.0 |
-| V. Test Transformations | ✅ Pass | ✅ Pass | Unit tests for validation/health builder; integration for `/agui` SSE |
+| V. Test Transformations | ✅ Pass | ✅ Pass | Unit tests at phase checkpoints (T010, T019, T030); integration tests (T026, T034) per story |
 | VI. Structured Events | ✅ Pass | ✅ Pass | `request_id` on all backend logs and health responses |
 | VII. Recovery Over Prevention | ✅ Pass | ✅ Pass | Mock mode default; env toggle for real mode; no migrations |
 | VIII. Attention Is Finite | ✅ Pass (v1) | ✅ Pass (v1) | No paging in v1 local scope; health endpoint is diagnostic only |
@@ -68,7 +68,7 @@ specs/001-agent-chat-app/
 ├── contracts/           # Phase 1
 │   ├── README.md
 │   └── health.openapi.yaml
-└── tasks.md             # Phase 2 (/speckit-tasks — not yet created)
+└── tasks.md             # Phase 2 (/speckit-tasks)
 ```
 
 ### Source Code (repository root)
@@ -145,7 +145,7 @@ Makefile                    # Canonical command index (Principle X)
 ### Phase A: Backend scaffold
 1. `pyproject.toml` with `agno[os,agui]`
 2. `main.py`: AgentOS + `AGUI(agent=...)` + CORS + `/health` route
-3. `agent.py`: factory selecting mock vs real model by `OPENAI_API_KEY`
+3. `agent.py`: factory selecting mock vs real model by `OPENAI_API_KEY`; **`add_history_to_context=False`** (context from AG-UI client messages only, per FR-003a)
 4. `mock_model.py`: deterministic Traditional Chinese streaming response
 5. `health.py`: schema v1.0.0 response + upstream probe
 

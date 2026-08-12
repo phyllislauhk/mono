@@ -81,12 +81,12 @@
 
 ## R6: Multi-turn conversation (FR-003a)
 
-**Decision**: Rely on AG-UI `RunAgentInput.messages` populated by assistant-ui runtime; backend Agno agent receives full thread context per request.
+**Decision**: Rely on AG-UI `RunAgentInput.messages` populated by assistant-ui runtime; backend Agno agent receives full thread context per request. Set **`add_history_to_context=False`** on the Agno agent to avoid duplicating client-sent history.
 
 **Rationale**:
 - Clarified answer: multi-turn with full history per request.
 - assistant-ui maintains in-memory thread; AG-UI protocol serializes messages array.
-- Agno agent uses `add_history_to_context=True` only for server-side session when `session_id` present; v1 primary path is client-sent history (no DB per FR-007).
+- Server-side session history (via `add_history_to_context`) is disabled in v1 to prevent double-counting when client already sends full thread (no DB per FR-007).
 
 ## R7: Input blocking during stream (FR-012)
 
